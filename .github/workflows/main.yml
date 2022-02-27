@@ -15,8 +15,5 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "glpdemoproject"
           heroku_email: "galipyildiz9606@outlook.com"
-          files : "DemoProject/DemoProject.API/appsettings.json"
           usedocker: true
-        env:
-          MONGODB_KEY: ${{secrets.MONGODB_KEY}}
-          POSTGRE_KEY: ${{secrets.POSTGRE_KEY}}
+
