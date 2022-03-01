@@ -27,7 +27,7 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
+      <BrowserRouter basename='/DemoProject'>
         <nav className='navbar'>
           <Link onClick={onClick} to="/">Home</Link>
           <Link onClick={onClick} to="/configuration">Configuration</Link>
