@@ -53,9 +53,9 @@ function App() {
           </Route>
           <Route path="/register" element={<Register></Register>}>
           </Route>
-          <Route path='/account' element={<Account></Account>}>
+          <Route path='/account' element={isLoggedIn ? <Account></Account> :<Login></Login>}>
           </Route>
-          <Route path="/logout" element={<Logout></Logout>}>
+          <Route path="/logout" element={isLoggedIn ? <Logout></Logout> :<Login></Login>}>
           </Route>
           <Route path="/configuration" element={isLoggedIn ? <Configuration></Configuration> : <Login></Login>}>
           </Route>

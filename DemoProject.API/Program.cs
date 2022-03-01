@@ -87,6 +87,8 @@ app.UseDefaultFiles();
 
 app.UseStaticFiles();
 
+app.UseCors();
+
 app.UseAuthentication();
 
 app.UseAuthorization();
