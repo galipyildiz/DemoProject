@@ -46,7 +46,7 @@ function App() {
 
 
         </nav>
-        <Routes>
+        <Routes basename="/DemoProject">
           <Route path="/" element={isLoggedIn ? <Home></Home> : <Login></Login>}>
           </Route>
           <Route path="/login" element={<Login></Login>}>
