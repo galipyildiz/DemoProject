@@ -13,12 +13,15 @@ import Error from './pages/Error.js'
 import Logout from './pages/Logout.js'
 import Account from './pages/Account.js'
 import { useState } from 'react';
-
+import AppContext from './AppContext';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const onClick = (e) => {
+  const [token, setToken] = useState(sessionStorage["token"] || localStorage["token"] || null);
+  const [username, setUsername] = useState(sessionStorage["username"] || localStorage["username"] || null);
+  const [isLoggedIn, setIsLoggedIn] = useState(token != null);
+
+  const handleClick = (e) => {
     for (const item of e.currentTarget.parentNode.children) {
       item.className = item.className.replace("active", "");
     }
@@ -26,21 +29,21 @@ function App() {
   }
 
   return (
-    <>
+    <AppContext.Provider value={{ token, setToken, username, setUsername, isLoggedIn, setIsLoggedIn }}>
       <BrowserRouter basename='/DemoProject'>
         <nav className='navbar'>
-          <Link onClick={onClick} to="/">Home</Link>
-          <Link onClick={onClick} to="/configuration">Configuration</Link>
+          <Link onClick={handleClick} to="/">Home</Link>
+          <Link onClick={handleClick} to="/configuration">Configuration</Link>
           {isLoggedIn
             ?
             <>
-              <Link onClick={onClick} className='left' to="/account">Account</Link>
-              <Link onClick={onClick} to="/logout">Logout</Link>
+              <Link onClick={handleClick} className='left' to="/account">Account</Link>
+              <Link onClick={handleClick} to="/logout">Logout</Link>
             </>
             :
             <>
-              <Link onClick={onClick} className='left' to="/login">Login</Link>
-              <Link onClick={onClick} to="/register">Register</Link>
+              <Link onClick={handleClick} className="left" to="/login">Login</Link>
+              <Link onClick={handleClick} to="/register">Register</Link>
             </>
           }
 
@@ -53,9 +56,9 @@ function App() {
           </Route>
           <Route path="/register" element={<Register></Register>}>
           </Route>
-          <Route path='/account' element={isLoggedIn ? <Account></Account> :<Login></Login>}>
+          <Route path='/account' element={isLoggedIn ? <Account></Account> : <Login></Login>}>
           </Route>
-          <Route path="/logout" element={isLoggedIn ? <Logout></Logout> :<Login></Login>}>
+          <Route path="/logout" element={isLoggedIn ? <Logout></Logout> : <Login></Login>}>
           </Route>
           <Route path="/configuration" element={isLoggedIn ? <Configuration></Configuration> : <Login></Login>}>
           </Route>
@@ -63,7 +66,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </>
+    </AppContext.Provider>
   );
 }
 

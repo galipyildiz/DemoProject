@@ -1,10 +1,10 @@
 import './Home.css'
 
-function Home(){
+function Home() {
     return (
-        <>
-            <h1>Home</h1>
-        </>
+        <div className='text-center'>
+            <h1>Dome Project Home Page</h1>
+        </div>
     );
 }
 
