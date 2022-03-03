@@ -111,7 +111,7 @@ namespace DemoProject.API.Controllers
                     Description = "BuildingType already exists."
                 });
             }
-            building.ConstructionTime = building.ConstructionTime;
+            building.ConstructionTime = buildingDTO.ConstructionTime;
             building.BuildingType = buildingDTO.BuildingType;
             building.BuildingCost = buildingDTO.BuildingCost;
             await _buildingService.UpdateBuildingAsync(id, building);
