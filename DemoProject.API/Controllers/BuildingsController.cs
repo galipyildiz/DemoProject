@@ -103,7 +103,7 @@ namespace DemoProject.API.Controllers
                     Description = "Building not found."
                 });
             }
-            if (await _buildingService.IsUserBuildingTypeExistsAsync(UserId, buildingDTO.BuildingType))
+            if (building.BuildingType != buildingDTO.BuildingType && await _buildingService.IsUserBuildingTypeExistsAsync(UserId, buildingDTO.BuildingType))
             {
                 return BadRequest(new
                 {

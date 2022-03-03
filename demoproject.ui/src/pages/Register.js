@@ -2,9 +2,10 @@ import axios from 'axios';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import apiUrl from '../env/config.js'
+import Loader from '../components/Loader';
 import './Register.css'
-
-
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
     const navigate = useNavigate();
@@ -34,7 +35,10 @@ function Register() {
             setEmail("");
             setPassword("");
             setConfirmPassword("");
-            navigate("/login");
+            toast.success("Successfully Registered. You will be redirect to login.", {
+                autoClose : 2000,
+                onClose: () => navigate("/account")
+            });
         }).finally(function () {
             form.style.display = "block";
             loader.style.display = "none";
@@ -43,14 +47,15 @@ function Register() {
                 setErrors(["Can not connect to the server."]);
                 return;
             }
-            else{
+            else {
                 setErrors([error.response.data["description"]]);
             }
         });
     }
     return (
         <div className='myElement'>
-            <div className="lds-hourglass"></div>
+            <Loader></Loader>
+            <ToastContainer />
             <form id="registerForm" onSubmit={handleSubmit}>
                 <h2 id="headerTitle">Register</h2>
                 <div className={errors.length == 0 ? "d-none" : "errors"}>

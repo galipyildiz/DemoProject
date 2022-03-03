@@ -4,6 +4,7 @@ import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import apiUrl from '../env/config.js'
 import axios from 'axios'
+import Loader from '../components/Loader';
 
 function Login() {
     const ctx = useContext(AppContext);
@@ -56,7 +57,7 @@ function Login() {
     }
     return (
         <div className='myElement'>
-            <div className="lds-hourglass"></div>
+            <Loader></Loader>
             <form id="loginform" onSubmit={handleSubmit}>
                 <h2 id="headerTitle">Login</h2>
                 <div className={errors.length == 0 ? "d-none" : "errors"}>

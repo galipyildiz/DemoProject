@@ -2,39 +2,3 @@ body{
     background-color: #f7780b;
 }
 
-/* NAVBAR */
-.navbar{
-    background-color: black;
-    display: flex;
-}
-.navbar > a{
-    color: white;
-    text-decoration: none;
-    padding: 20px;
-    font-size: 1.3rem;
-    font-weight: bold;
-}
-.navbar > a:hover{
-    background-color: white;
-    color: #f7780b;
-}
-.active{
-    background-color: #f7780b !important;
-    color: white !important;
-}
-.active:hover{
-    background-color: white !important;
-    color: #f7780b !important;
-}
-.left{
-    margin-left: auto;
-}
-@media screen and (max-width:480px) {
-    .navbar{
-        flex-direction: column;
-        align-items: center;
-    }
-    .left{
-        margin-left: 0px;
-    }
-}
