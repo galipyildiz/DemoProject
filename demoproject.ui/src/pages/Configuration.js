@@ -5,9 +5,16 @@ import apiUrl from '../env/config.js'
 import AppContext from '../AppContext';
 import { useContext, useState } from 'react';
 
-const MyAwesomeTable = () => {
+function MyAwesomeTable(){
+    const Header = ({}) => {
+        return (
+            <>
+            </>
+        );
+    }
     const [rows, setRows] = useState([]);
-    const [totalRows,setTotalRows] = useState([]);
+    const [totalRows, setTotalRows] = useState();
+    const [editRowId, setEditRowId] = useState(null)
     const ctx = useContext(AppContext);
     function onRowsRequest() {
         axios.get(apiUrl + "Buildings", {
@@ -17,19 +24,19 @@ const MyAwesomeTable = () => {
         }).then(function (response) {
             setRows(response.data)
             setTotalRows(response.data.length)
-            
+
         }).catch(function (error) {
             console.log(error);
             return;
         })
     };
 
-    const build = ({value}) =>{
-        const imgPath = './images/' + value +'.png';
-        return(
-            <div style={{display:'flex', justifyContent:'center', alignItems:'center'}}>
+    const build = ({ value }) => {
+        const imgPath = './images/' + value + '.png';
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <img src={imgPath} width={128} height={128} />
-                <span style={{marginLeft:'10px', fontSize:'2rem'}}>{value}</span>
+                <span style={{ marginLeft: '10px', fontSize: '2rem' }}>{value}</span>
             </div>
         )
     }
@@ -40,31 +47,58 @@ const MyAwesomeTable = () => {
             field: 'buildingType',
             label: 'Building Type',
             width: '3fr',
-            cellRenderer: build
+            sortable: false,
+            cellRenderer: build,
         },
         {
             id: 2,
             field: 'buildingCost',
             label: 'Building Cost',
-            width: '3fr'
+            width: '3fr',
+            sortable: false
         },
         {
             id: 3,
             field: 'constructionTime',
             label: 'Construction Time(second)',
-            width: '3fr'
+            width: '3fr',
+            sortable: false
         },
         {
             id: 4,
             field: 'id',
             label: 'Id',
-            visible : false
+            visible: false
         },
         {
             id: 5,
             field: 'userId',
             label: 'User Id',
-            visible : false
+            visible: false
+        },
+        {
+            id: 'my-buttons-column',
+            width: 'max-content',
+            pinned: true,
+            sortable: false,
+            resizable: false,
+            cellRenderer: () => (
+                <button 
+                    style={
+                        {
+                            marginRight: 20,
+                            borderRadius:'40%',
+                            padding:5,
+                            fontSize:'1.3rem',
+                            backgroundColor:'#5bc0de',
+                            border:'0px',
+                            color:'snow',
+                            cursor:'pointer'
+                        }
+                    } 
+                    onClick={e => alert("test")}
+                >&#x270E;</button>
+            )
         }
     ];
     return (
@@ -72,10 +106,10 @@ const MyAwesomeTable = () => {
             columns={columns}
             onRowsRequest={onRowsRequest}
             rows={rows}
-            onRowsChange={setRows}
+            // onRowsChange={setRows}
             totalRows={totalRows}
-            onTotalRowsChange={setTotalRows}
-            
+            components = {{Header}}
+        // onTotalRowsChange={setTotalRows}
         />
     );
 
@@ -84,7 +118,7 @@ const MyAwesomeTable = () => {
 function Configuration() {
     return (
         <div className='configuration'>
-            <h1 className='text-center'>Configuration</h1>
+            <button onClick={()=>alert('test')} className='addButton'>Add Building</button>
             <MyAwesomeTable></MyAwesomeTable>
         </div>
     );
