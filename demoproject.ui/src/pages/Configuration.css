@@ -1,5 +1,5 @@
 .configuration{
-    padding: 50px;
+    padding:50px;
 }
 .addButton{
     border: 0px;
@@ -17,6 +17,32 @@
 .d-none{
     display: none;
 }
-.modal{
-    
-}
+
+.modal {
+    background: white;
+    border: 1px solid #d0cccc;
+    box-shadow: 0 5px 8px 0 rgba(0,0,0,0.2), 0 7px 20px 0 rgba(0,0,0,0.17);
+    margin: 100px auto 0;
+    transition: all .8s;
+    width: 60%;
+    border-radius: 10px;
+    }
+     
+    .modal-header {
+    background: #e2e2e2;
+    height: 40px;
+    color: #C2C2C2;
+    line-height: 40px;
+    padding: 5px 20px;
+    text-align: center;
+    }
+ .addEditBtn{
+    background-color: #316e31 !important;
+    margin-top: 20px;
+    margin-bottom: 20px;
+ }
+ .closeBtn{
+    background-color: red !important;
+    margin-bottom: 20px;
+ }
+     

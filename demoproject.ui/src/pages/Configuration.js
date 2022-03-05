@@ -40,6 +40,8 @@ function Configuration() {
             setTotalRows(data.length);
 
         }).catch(function (error) {
+            setRows([]);
+            setTotalRows(0);
             if (error.response.status == "401") {
                 //token suresi geçtiği zaman.
                 localStorage.removeItem("token");
@@ -71,15 +73,16 @@ function Configuration() {
 
     function handleEditClick(e, data) {
         e.preventDefault();
-        loadAvailableTypes();
+        loadAvailableTypes(true);
         setBuildingCost(data.buildingCost);
         setConstructionTime(data.constructionTime);
         setBuildingType(data.buildingType);
         setEditingBuildingType(data.buildingType);
         setEditBuildingId(data.id);
+
+        setIsAddForm(false);
         setShowTable(false);
         setShowModal(true);
-        setIsAddForm(false);
     }
 
     function handleAddClick(e) {
@@ -87,7 +90,7 @@ function Configuration() {
         loadAvailableTypes();
     }
 
-    function loadAvailableTypes() {
+    function loadAvailableTypes(edit) {
         axios.get(apiUrl + "Buildings/AvailableTypes", {
             headers: {
                 Authorization: ctx.token
@@ -95,7 +98,7 @@ function Configuration() {
         }).then(function (response) {
             setAvailableBuildingTypes(response.data);
             setBuildingType(response.data[0]);
-            if (response.data.length == 0) {
+            if (response.data.length === 0 && !edit) {
                 toast.error("You have reached the maximum building capacity. You can't add buildings.", {
                     autoClose: 3000
                 });
@@ -108,13 +111,18 @@ function Configuration() {
     }
 
     function handleModalCloseClick(e) {
+        if (e != undefined) {
+            e.preventDefault();
+        }
         setShowTable(true);
         setShowModal(false);
     }
 
     function handleFormSubmit(e, isAddForm) {
         e.preventDefault();
+        console.log("form geldi.")
         if (isAddForm) {
+            console.log("add form")
             axios.post(apiUrl + "Buildings", {
                 buildingCost: buildingCost,
                 constructionTime: constructionTime,
@@ -124,17 +132,27 @@ function Configuration() {
                     Authorization: ctx.token
                 }
             }).then(function (response) {
-                handleModalCloseClick();
-                loadData();
+                console.log("başarı!")
+                toast.success("Successfully added building.", {
+                    autoClose: 500,
+                    onClose: () => {
+                        handleModalCloseClick();
+                        loadData();
+                    }
+                });
             }).catch(function (error) {
                 console.log(error.response);
             });
         }
         else {
+            let buildType = buildingType
+            if (buildingType === undefined) {
+                buildType = editingBuildingType
+            }
             axios.put(apiUrl + `Buildings/${editBuildingId}`, {
                 buildingCost: buildingCost,
                 constructionTime: constructionTime,
-                buildingType: buildingType
+                buildingType: buildType
             }, {
                 headers: {
                     Authorization: ctx.token
@@ -254,27 +272,36 @@ function Configuration() {
                 <GridTable
                     columns={columns}
                     rows={rows}
+                    onRowsRequest={loadData}
                     totalRows={totalRows}
                     components={{ Header }}
                 />
             </div>
             <div className={showModal ? "modal" : "d-none"}>
-                <h1>{isAddForm ? "Add Building" : "Edit Building"}</h1>
-                <form onSubmit={(e) => handleFormSubmit(e, isAddForm)}>
-                    <input min={0} max={100000} value={buildingCost} type="number" onChange={(e) => setBuildingCost(e.target.value)}></input>
-                    <input min={30} value={constructionTime} max={1800} type="number" onChange={(e) => setConstructionTime(e.target.value)}></input>
-                    <select onChange={(e) => setBuildingType(e.target.value)}>
-                        {
-                            isAddForm == false ? <option defaultValue={true}>{editingBuildingType}</option> : <></>
-                        }
-                        {
-                            availableBuildingTypes.map((type, index) => <option key={index}>{type}</option>)
-                        }
-                    </select>
-                    <button>{isAddForm ? "Add" : "Edit"}</button>
-                </form>
+                <h1 className='modal-header'>{isAddForm ? "Add Building" : "Edit Building"}</h1>
+                <div className='row'>
+                    <form onSubmit={(e) => handleFormSubmit(e, isAddForm)}>
+                        <div>
+                            <label>Building Cost</label>
+                            <input min={0} max={100000} value={buildingCost} type="number" onChange={(e) => setBuildingCost(e.target.value)}></input>
+                        </div>
+                        <div>
+                            <label>Construction Time</label>
+                            <input min={30} value={constructionTime} max={1800} type="number" onChange={(e) => setConstructionTime(e.target.value)}></input>
+                        </div>
 
-                <button onClick={(e) => handleModalCloseClick(e)}>Close</button>
+                        <select style={{marginTop:10}} onChange={(e) => setBuildingType(e.target.value)}>
+                            {
+                                isAddForm == false ? <option defaultValue={true}>{editingBuildingType}</option> : <></>
+                            }
+                            {
+                                availableBuildingTypes.map((type, index) => <option key={index}>{type}</option>)
+                            }
+                        </select>
+                        <button className='addEditBtn'>{isAddForm ? "Add" : "Edit"}</button>
+                        <button className='closeBtn' onClick={(e) => handleModalCloseClick(e)}>Close</button>
+                    </form>
+                </div>
             </div>
         </div>
     );
