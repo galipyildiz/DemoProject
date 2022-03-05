@@ -15,7 +15,7 @@ function Configuration() {
     const [totalRows, setTotalRows] = useState();
     const [showTable, setShowTable] = useState(true);
     const [showModal, setShowModal] = useState(false);
-    const [buildingCost, setBuildingCost] = useState(0);
+    const [buildingCost, setBuildingCost] = useState(1);
     const [constructionTime, setConstructionTime] = useState(30);
     const [buildingType, setBuildingType] = useState();
     const [editingBuildingType, setEditingBuildingType] = useState();
@@ -117,7 +117,7 @@ function Configuration() {
         setShowTable(true);
         setShowModal(false);
     }
-    
+
     function handleFormSubmit(e, isAddForm) {
         e.preventDefault();
         if (isAddForm) {
@@ -280,7 +280,7 @@ function Configuration() {
                     <form onSubmit={(e) => handleFormSubmit(e, isAddForm)}>
                         <div>
                             <label>Building Cost</label>
-                            <input min={0} max={100000} value={buildingCost} type="number" onChange={(e) => setBuildingCost(e.target.value)}></input>
+                            <input min={1} max={100000} value={buildingCost} type="number" onChange={(e) => setBuildingCost(e.target.value)}></input>
                         </div>
                         <div>
                             <label>Construction Time</label>

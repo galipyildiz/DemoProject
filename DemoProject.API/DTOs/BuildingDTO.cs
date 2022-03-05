@@ -5,7 +5,7 @@ namespace DemoProject.API.DTOs
 {
     public class BuildingDTO
     {
-        [Range(0, double.MaxValue)]
+        [Range(1, double.MaxValue)]
         public int BuildingCost { get; set; }
 
         [Range(30, 1800)]
