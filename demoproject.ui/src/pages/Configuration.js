@@ -117,12 +117,10 @@ function Configuration() {
         setShowTable(true);
         setShowModal(false);
     }
-
+    
     function handleFormSubmit(e, isAddForm) {
         e.preventDefault();
-        console.log("form geldi.")
         if (isAddForm) {
-            console.log("add form")
             axios.post(apiUrl + "Buildings", {
                 buildingCost: buildingCost,
                 constructionTime: constructionTime,
@@ -132,7 +130,6 @@ function Configuration() {
                     Authorization: ctx.token
                 }
             }).then(function (response) {
-                console.log("başarı!")
                 toast.success("Successfully added building.", {
                     autoClose: 500,
                     onClose: () => {
@@ -290,7 +287,7 @@ function Configuration() {
                             <input min={30} value={constructionTime} max={1800} type="number" onChange={(e) => setConstructionTime(e.target.value)}></input>
                         </div>
 
-                        <select style={{marginTop:10}} onChange={(e) => setBuildingType(e.target.value)}>
+                        <select style={{ marginTop: 10 }} onChange={(e) => setBuildingType(e.target.value)}>
                             {
                                 isAddForm == false ? <option defaultValue={true}>{editingBuildingType}</option> : <></>
                             }
