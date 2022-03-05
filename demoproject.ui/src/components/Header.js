@@ -8,8 +8,8 @@ function Header() {
     const location = useLocation();
     const splitLocation = location.pathname.split("/");
     return (
-        <nav nav className='navbar' >
-            <Link className={splitLocation[1] === "" ? "active" : ""}  to="/">Home</Link>
+        <nav className='navbar'>
+            <Link className={splitLocation[1] === "" ? "active" : ""} to="/">Home</Link>
             <Link className={splitLocation[1] === "configuration" ? "active" : ""} to="/configuration">Configuration</Link>
             {
                 ctx.isLoggedIn

@@ -3,38 +3,162 @@ import GridTable from '@nadavshaar/react-grid-table';
 import axios from 'axios';
 import apiUrl from '../env/config.js'
 import AppContext from '../AppContext';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-function MyAwesomeTable(){
-    const Header = ({}) => {
+function Configuration() {
+    const navigate = useNavigate();
+    const ctx = useContext(AppContext);
+    const [rows, setRows] = useState([{}]);
+    const [totalRows, setTotalRows] = useState();
+    const [showTable, setShowTable] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [buildingCost, setBuildingCost] = useState(0);
+    const [constructionTime, setConstructionTime] = useState(30);
+    const [buildingType, setBuildingType] = useState();
+    const [editingBuildingType, setEditingBuildingType] = useState();
+    const [editBuildingId, setEditBuildingId] = useState();
+    const [availableBuildingTypes, setAvailableBuildingTypes] = useState([]);
+    const [isAddForm, setIsAddForm] = useState(true);
+    const Header = () => {
         return (
             <>
             </>
         );
     }
-    const [rows, setRows] = useState([]);
-    const [totalRows, setTotalRows] = useState();
-    const [editRowId, setEditRowId] = useState(null)
-    const ctx = useContext(AppContext);
-    function onRowsRequest() {
+
+    const loadData = function () {
         axios.get(apiUrl + "Buildings", {
             headers: {
                 Authorization: ctx.token
             }
         }).then(function (response) {
-            setRows(response.data)
-            setTotalRows(response.data.length)
+            const data = response.data;
+            setRows(data);
+            setTotalRows(data.length);
 
         }).catch(function (error) {
-            console.log(error);
-            return;
+            if (error.response.status == "401") {
+                //token suresi geçtiği zaman.
+                localStorage.removeItem("token");
+                localStorage.removeItem("username");
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("username");
+                ctx.setToken(null);
+                ctx.setIsLoggedIn(false);
+                navigate('/login');
+            }
         })
     };
+
+    function handleDeleteClick(e, data) {
+        if (window.confirm(`Are you sure you wish to delete this ${data.buildingType}?`)) {
+            console.log(rows);
+            console.log(totalRows)
+            axios.delete(apiUrl + `Buildings/${data.id}`, {
+                headers: {
+                    Authorization: ctx.token
+                }
+            }).then(function (response) {
+                loadData();
+            }).catch(function (error) {
+                console.log(error.response);
+            })
+        }
+    }
+
+    function handleEditClick(e, data) {
+        e.preventDefault();
+        loadAvailableTypes();
+        setBuildingCost(data.buildingCost);
+        setConstructionTime(data.constructionTime);
+        setBuildingType(data.buildingType);
+        setEditingBuildingType(data.buildingType);
+        setEditBuildingId(data.id);
+        setShowTable(false);
+        setShowModal(true);
+        setIsAddForm(false);
+    }
+
+    function handleAddClick(e) {
+        setIsAddForm(true);
+        loadAvailableTypes();
+    }
+
+    function loadAvailableTypes() {
+        axios.get(apiUrl + "Buildings/AvailableTypes", {
+            headers: {
+                Authorization: ctx.token
+            }
+        }).then(function (response) {
+            setAvailableBuildingTypes(response.data);
+            setBuildingType(response.data[0]);
+            if (response.data.length == 0) {
+                toast.error("You have reached the maximum building capacity. You can't add buildings.", {
+                    autoClose: 3000
+                });
+            }
+            else {
+                setShowTable(false);
+                setShowModal(true);
+            }
+        })
+    }
+
+    function handleModalCloseClick(e) {
+        setShowTable(true);
+        setShowModal(false);
+    }
+
+    function handleFormSubmit(e, isAddForm) {
+        e.preventDefault();
+        if (isAddForm) {
+            axios.post(apiUrl + "Buildings", {
+                buildingCost: buildingCost,
+                constructionTime: constructionTime,
+                buildingType: buildingType
+            }, {
+                headers: {
+                    Authorization: ctx.token
+                }
+            }).then(function (response) {
+                handleModalCloseClick();
+                loadData();
+            }).catch(function (error) {
+                console.log(error.response);
+            });
+        }
+        else {
+            axios.put(apiUrl + `Buildings/${editBuildingId}`, {
+                buildingCost: buildingCost,
+                constructionTime: constructionTime,
+                buildingType: buildingType
+            }, {
+                headers: {
+                    Authorization: ctx.token
+                }
+            }).then(function (response) {
+                handleModalCloseClick();
+                loadData();
+            }).catch(function (error) {
+                console.log(error.response);
+            });
+        }
+
+    }
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+
 
     const build = ({ value }) => {
         const imgPath = './images/' + value + '.png';
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 10 }}>
                 <img src={imgPath} width={128} height={128} />
                 <span style={{ marginLeft: '10px', fontSize: '2rem' }}>{value}</span>
             </div>
@@ -82,46 +206,78 @@ function MyAwesomeTable(){
             pinned: true,
             sortable: false,
             resizable: false,
-            cellRenderer: () => (
-                <button 
-                    style={
-                        {
-                            marginRight: 20,
-                            borderRadius:'40%',
-                            padding:5,
-                            fontSize:'1.3rem',
-                            backgroundColor:'#5bc0de',
-                            border:'0px',
-                            color:'snow',
-                            cursor:'pointer'
+            cellRenderer: (value) => (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <button
+                        style={
+                            {
+                                marginRight: 20,
+                                marginBottom: 20,
+                                borderRadius: '40%',
+                                padding: 5,
+                                flexBasis: 35,
+                                fontSize: '1.3rem',
+                                backgroundColor: '#5bc0de',
+                                border: '0px',
+                                color: 'snow',
+                                cursor: 'pointer'
+                            }
                         }
-                    } 
-                    onClick={e => alert("test")}
-                >&#x270E;</button>
+                        onClick={e => handleEditClick(e, value.data)}
+                    >&#x270E;</button>
+                    <button
+                        style={
+                            {
+                                marginRight: 20,
+                                borderRadius: '40%',
+                                padding: 5,
+                                paddingRight: 10,
+                                paddingLeft: 10,
+                                fontSize: '1.3rem',
+                                backgroundColor: '#d9534f',
+                                border: '0px',
+                                color: 'snow',
+                                cursor: 'pointer'
+                            }
+                        }
+                        onClick={e => handleDeleteClick(e, value.data)}
+                    >&#128465;</button>
+                </div>
             )
         }
     ];
     return (
-        <GridTable
-            columns={columns}
-            onRowsRequest={onRowsRequest}
-            rows={rows}
-            // onRowsChange={setRows}
-            totalRows={totalRows}
-            components = {{Header}}
-        // onTotalRowsChange={setTotalRows}
-        />
+        <div className='configuration'>
+            <ToastContainer />
+            <div className={showTable ? "" : "d-none"}>
+                <button onClick={(e) => handleAddClick(e)} className='addButton'>Add Building</button>
+                <GridTable
+                    columns={columns}
+                    rows={rows}
+                    totalRows={totalRows}
+                    components={{ Header }}
+                />
+            </div>
+            <div className={showModal ? "modal" : "d-none"}>
+                <h1>{isAddForm ? "Add Building" : "Edit Building"}</h1>
+                <form onSubmit={(e) => handleFormSubmit(e, isAddForm)}>
+                    <input min={0} max={100000} value={buildingCost} type="number" onChange={(e) => setBuildingCost(e.target.value)}></input>
+                    <input min={30} value={constructionTime} max={1800} type="number" onChange={(e) => setConstructionTime(e.target.value)}></input>
+                    <select onChange={(e) => setBuildingType(e.target.value)}>
+                        {
+                            isAddForm == false ? <option defaultValue={true}>{editingBuildingType}</option> : <></>
+                        }
+                        {
+                            availableBuildingTypes.map((type, index) => <option key={index}>{type}</option>)
+                        }
+                    </select>
+                    <button>{isAddForm ? "Add" : "Edit"}</button>
+                </form>
+
+                <button onClick={(e) => handleModalCloseClick(e)}>Close</button>
+            </div>
+        </div>
     );
 
 };
-
-function Configuration() {
-    return (
-        <div className='configuration'>
-            <button onClick={()=>alert('test')} className='addButton'>Add Building</button>
-            <MyAwesomeTable></MyAwesomeTable>
-        </div>
-    );
-}
-
 export default Configuration;

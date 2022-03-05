@@ -14,3 +14,9 @@
 .addButton:hover{
    background-color: #316e31;
 }
+.d-none{
+    display: none;
+}
+.modal{
+    
+}
